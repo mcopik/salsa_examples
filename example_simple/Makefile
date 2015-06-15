@@ -1,5 +1,7 @@
-
-CXXFLAGS =-O2 -g -Wall -std=c++11
+BOOST_INCLUDE=/usr/include/boost/
+BOOST_LIB=-lboost_mpi	
+CXXFLAGS =-O2 -g -Wall -std=c++11 -I $(BOOST_INCLUDE)
+LDFLAGS= $(BOOST_LIB)
 CXX=mpic++
 SRCDIR = src
 SRCS = $(wildcard $(SRCDIR)/*.cpp)
@@ -7,7 +9,7 @@ OBJS = $(SRCS:$(SRCDIR)/%.cpp=bin/%.o)
 TARGET = bin/example.exe
 
 $(TARGET):      $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(TARGET) $(OBJS)
 
 all:    $(TARGET)
 
