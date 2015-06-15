@@ -38,7 +38,7 @@ int main(int argc, char ** argv)
 			//dont send msg to yourself
 			continue;
 		}
-		cout << "Send from " << my_rank << " to " << i << endl;
+
 		// send i+1 times
 		for(int32_t j = 0; j < (i + 1); ++j) {
 			requests.push_back( world.isend(i, 0, j) );
