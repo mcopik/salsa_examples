@@ -18,7 +18,20 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-int main(int argc, char ** argv) 
+mpi::request send_even(const mpi::communicator & comm, int32_t dst, int32_t tag, int32_t msg)
+{
+	assert( dst % 2 == 0 );
+	return comm.isend(dst, tag, msg);
+}
+
+mpi::request send_odd(const mpi::communicator & comm, int32_t dst, int32_t tag, int32_t msg)
+{
+        assert( dst % 2);
+        return comm.isend(dst, tag, msg);
+}
+
+
+int main(int argc, char ** argv)
 {
 
 	mpi::environment env(argc, argv);
@@ -27,13 +40,12 @@ int main(int argc, char ** argv)
 	int32_t my_rank = world.rank();
 	int32_t size = world.size();
 
-	
-	vector<mpi::request> requests;
-	int32_t * recvs = new int32_t[size];	
 
+	vector<mpi::request> requests;
+	int32_t * recvs = new int32_t[size];
 
 	for(int32_t i = 0; i < size; ++i) {
-		
+
 		if(my_rank == i) {
 			//dont send msg to yourself
 			continue;
@@ -41,7 +53,11 @@ int main(int argc, char ** argv)
 
 		// send i+1 times
 		for(int32_t j = 0; j < (i + 1); ++j) {
-			requests.push_back( world.isend(i, 0, j) );
+			if(i % 2 == 0) {
+				requests.push_back( send_even(world, i, 0, j) );
+			} else {
+				requests.push_back( send_odd(world, i, 0, j) );
+			}
 		}
 		// receive my_rank + 1 times
 		for(int32_t j = 0; j < (my_rank + 1); ++j) {
@@ -63,6 +79,6 @@ int main(int argc, char ** argv)
 	}
 
 	delete[] recvs;
-		
+
 	return 0;
 }
